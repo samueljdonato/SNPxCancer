@@ -67,7 +67,47 @@ rs789012
 
 ⚙️ Next Planned Phase (Phase II — Analysis & Modeling)
 	1.	Map rsIDs → genomic coordinates (GRCh37) using Ensembl REST.
+	The Ensembl REST gave errors given the size of rsIDs so downloads of the variant database were made to the local disk with the following commands
+
+cd data/raw
+wget ftp://ftp.ensembl.org/pub/grch37/current/variation/vcf/homo_sapiens/homo_sapiens-chr17.vcf.gz
+wget ftp://ftp.ensembl.org/pub/grch37/current/variation/vcf/homo_sapiens/homo_sapiens-chr17.vcf.gz.csi
+
+Used map_rsids_chr17.sh to map
+
+Workflow outline 
+SNPxCancer Project — Session Summary (Chromosome 17 Variant Mapping Workflow)
+	•	Pivoted the workflow from API-based rsID mapping (Ensembl REST) to a fully offline, reproducible workflow using Ensembl GRCh37 VCF data.
+	•	Inspected the Ensembl FTP structure to identify available per-chromosome variant reference files.
+	•	Chose chromosome 17 as the focus dataset (oncology relevance – TP53, BRCA1, ERBB2 loci).
+	•	Downloaded reference variant catalog:
+	•	homo_sapiens-chr17.vcf.gz and its index .csi from Ensembl GRCh37.
+	•	Confirmed these contain all rsIDs and coordinates for chr17.
+	•	Verified that this approach eliminates the need for the large whole-genome variant file.
+	•	Confirmed existing 1000 Genomes chr17 genotypes (ALL.chr17.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz) as the complementary dataset.
+	•	Created a bash pipeline (scripts/map_rsids_chr17.sh) to:
+	•	Filter the Ensembl chr17 VCF by a list of cancer-associated rsIDs (cancer_rsids.txt).
+	•	Output a clean coordinate table cancer_rsids_chr17.tsv (rsID → chromosome → position).
+	•	Optionally build .regions and subset the 1000 Genomes VCF.
+	•	Installed bcftools via Homebrew for high-speed, offline variant querying.
+	•	Executed the mapping script successfully, producing data/processed/cancer_rsids_chr17.tsv, a verified list of cancer-related variants mapped to chr17 coordinates.
+	•	Validated reproducibility and data hygiene:
+	•	Added .gitignore rules to exclude large .vcf and .gz files from Git.
+	•	Retained directory structure with .gitkeep.
+
+Next Steps
+
 	2.	Subset the 1000 Genomes chr17 VCF to include only cancer-relevant variants.
 	3.	Generate genotype matrices (samples × variants).
 	4.	Annotate variants via ClinVar or Ensembl VEP.
 	5.	Engineer features + train ML models predicting cancer association patterns.
+
+
+
+
+
+
+
+
+
+Need to add a fetch script for 
